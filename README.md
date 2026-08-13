@@ -4,7 +4,7 @@
 
 `article-editor` 是一个面向 OpenAI Codex、Claude Code 及其他兼容 Agent Skills 标准的技术编辑 Skill。它不从一个空泛主题凭空写文章，而是把草稿、设计文档、技术笔记和研究材料编辑成有主线、有判断、有视觉规划的专业技术文章。
 
-当前版本：`v0.1`
+当前版本：`v0.1.1`
 
 ## 它解决什么问题
 
@@ -27,6 +27,7 @@
 - **Polish**：在不改变结构的前提下做局部去 AI 味和语言润色；
 - **Visual planning**：输出独立的 `visual-plan.md`，不把装饰性图片当作技术图；
 - **Publication layout**：提供技术博客与设计决策文章模板。
+- **WeChat publishing handoff**：在用户明确授权后，把最终 Markdown 交给独立的 `baoyu-post-to-wechat` Skill 写入公众号草稿箱。
 
 ## 设计原则
 
@@ -121,6 +122,28 @@ ln -s /absolute/path/to/article-editor .claude/skills/article-editor
 审核 wal-draft.md。给出结构评分、证据、三个最高优先级问题和新的章节大纲，不要改写正文。
 ```
 
+## 微信公众号发布集成
+
+`article-editor` 负责编辑，第三方 [`baoyu-post-to-wechat`](https://github.com/JimLiu/baoyu-skills/tree/main/skills/baoyu-post-to-wechat) 负责微信 HTML 渲染、图片上传和公众号草稿创建。两者独立安装、独立升级；本仓库不复制第三方代码或保存公众号凭证。
+
+安装发布 Skill：
+
+```bash
+npx skills add JimLiu/baoyu-skills
+```
+
+安装时选择 `baoyu-post-to-wechat`。Codex 也可以使用自身的 Skill Installer 从 `JimLiu/baoyu-skills` 的 `skills/baoyu-post-to-wechat` 路径安装。
+
+组合调用示例：
+
+```text
+先使用 $article-editor 把 draft.md 编辑成公众号技术文章，保存为 article.md。
+通过最终检查后，再使用 $baoyu-post-to-wechat 把 article.md 写入公众号草稿箱。
+不要直接群发。
+```
+
+只说“写成公众号风格”不会触发远程发布。只有“上传公众号”“推到草稿箱”等明确指令才构成发布授权。首次实际发布仍需按发布 Skill 配置浏览器登录态，或者公众号 API 凭证与 IP 白名单。
+
 ## 输出
 
 默认编辑任务生成：
@@ -143,6 +166,7 @@ article-editor/
 │   ├── humanize.md
 │   ├── technical-writing.md
 │   ├── wechat-style.md
+│   ├── wechat-publishing.md
 │   ├── visual-design.md
 │   └── anti-ai-patterns.md
 ├── templates/
