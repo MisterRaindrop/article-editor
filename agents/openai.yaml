@@ -1,0 +1,4 @@
+interface:
+  display_name: "Article Editor"
+  short_description: "Turn technical drafts into publication-ready articles"
+  default_prompt: "Use $article-editor to transform this technical draft into a publication-ready engineering article and visual plan."
