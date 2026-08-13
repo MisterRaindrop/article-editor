@@ -1,0 +1,8 @@
+source_repository: JimLiu/baoyu-skills
+fork_repository: MisterRaindrop/baoyu-skills
+skill_path: skills/baoyu-post-to-wechat
+upstream_branch: main
+stable_branch: article-editor
+ref: 6b7a2e417500561a5ecdd0b168332f4142584617
+skill_version: 1.118.2
+update_policy: reviewed-manual

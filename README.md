@@ -4,7 +4,7 @@
 
 `article-editor` 是一个面向 OpenAI Codex、Claude Code 及其他兼容 Agent Skills 标准的技术编辑 Skill。它不从一个空泛主题凭空写文章，而是把草稿、设计文档、技术笔记和研究材料编辑成有主线、有判断、有视觉规划的专业技术文章。
 
-当前版本：`v0.1.1`
+当前版本：`v0.1.2`
 
 ## 它解决什么问题
 
@@ -124,15 +124,29 @@ ln -s /absolute/path/to/article-editor .claude/skills/article-editor
 
 ## 微信公众号发布集成
 
-`article-editor` 负责编辑，第三方 [`baoyu-post-to-wechat`](https://github.com/JimLiu/baoyu-skills/tree/main/skills/baoyu-post-to-wechat) 负责微信 HTML 渲染、图片上传和公众号草稿创建。两者独立安装、独立升级；本仓库不复制第三方代码或保存公众号凭证。
+`article-editor` 负责编辑，我们维护的 [`MisterRaindrop/baoyu-skills`](https://github.com/MisterRaindrop/baoyu-skills/tree/article-editor/skills/baoyu-post-to-wechat) fork 负责微信 HTML 渲染、图片上传和公众号草稿创建。两者独立安装、独立升级；本仓库不复制发布器代码或保存公众号凭证。
+
+发布器 fork 使用两条分支：
+
+| 分支 | 用途 |
+|---|---|
+| `main` | 保持为 [`JimLiu/baoyu-skills`](https://github.com/JimLiu/baoyu-skills) 的上游镜像 |
+| `article-editor` | 经过检查后供本项目安装的稳定集成分支 |
+
+当前安装基线记录在 [`integrations/baoyu-post-to-wechat.lock`](integrations/baoyu-post-to-wechat.lock)。实际发布只调用本地已安装快照，不会在运行时访问或自动更新 GitHub 代码。
 
 安装发布 Skill：
 
 ```bash
-npx skills add JimLiu/baoyu-skills
+npx skills add \
+  https://github.com/MisterRaindrop/baoyu-skills/tree/6b7a2e417500561a5ecdd0b168332f4142584617/skills/baoyu-post-to-wechat
 ```
 
-安装时选择 `baoyu-post-to-wechat`。Codex 也可以使用自身的 Skill Installer 从 `JimLiu/baoyu-skills` 的 `skills/baoyu-post-to-wechat` 路径安装。
+这会安装经过锁定的 `baoyu-post-to-wechat` 快照。Codex 也可以直接这样请求：
+
+```text
+使用 $skill-installer 从 MisterRaindrop/baoyu-skills 安装 skills/baoyu-post-to-wechat，ref 使用 integrations/baoyu-post-to-wechat.lock 中记录的 commit。
+```
 
 组合调用示例：
 
@@ -143,6 +157,26 @@ npx skills add JimLiu/baoyu-skills
 ```
 
 只说“写成公众号风格”不会触发远程发布。只有“上传公众号”“推到草稿箱”等明确指令才构成发布授权。首次实际发布仍需按发布 Skill 配置浏览器登录态，或者公众号 API 凭证与 IP 白名单。
+
+### 同步上游
+
+仓库中的 `check-wechat-upstream` GitHub Action 每周检查 fork 镜像、稳定分支和锁定 commit。它只报告差异，不会把未经测试的上游代码自动带入发布链路。
+
+发现更新后按以下流程处理：
+
+```bash
+# 1. 只同步 fork 的上游镜像分支
+gh repo sync MisterRaindrop/baoyu-skills --branch main
+
+# 2. 在 fork 中创建 main → article-editor 的同步 PR
+gh pr create \
+  --repo MisterRaindrop/baoyu-skills \
+  --base article-editor \
+  --head main \
+  --title "Sync baoyu-skills upstream"
+```
+
+在同步 PR 中审查微信发布相关 diff，并按上游 CI 从 fork 仓库根目录运行 `npm test`；合并后更新 lock 文件的 `ref` 与 `skill_version`，再从该 commit 重装本地 Skill。不要使用 `--force` 覆盖稳定分支。
 
 ## 输出
 
@@ -158,10 +192,14 @@ npx skills add JimLiu/baoyu-skills
 
 ```text
 article-editor/
+├── .github/workflows/
+│   └── check-wechat-upstream.yml
 ├── SKILL.md
 ├── README.md
 ├── agents/
 │   └── openai.yaml
+├── integrations/
+│   └── baoyu-post-to-wechat.lock
 ├── references/
 │   ├── humanize.md
 │   ├── technical-writing.md
@@ -172,6 +210,8 @@ article-editor/
 ├── templates/
 │   ├── technical-blog.md
 │   └── design-doc.md
+├── scripts/
+│   └── check-wechat-upstream.sh
 └── examples/
     └── demo-before-after.md
 ```

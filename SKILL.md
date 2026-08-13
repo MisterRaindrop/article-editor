@@ -37,7 +37,7 @@ Read each selected resource completely before applying it. Do not load every fil
 - For any prose rewrite, read [references/humanize.md](references/humanize.md).
 - For AI-heavy source text or an explicit “de-AI” request, also read [references/anti-ai-patterns.md](references/anti-ai-patterns.md).
 - For Chinese WeChat or another mobile-first publication, read [references/wechat-style.md](references/wechat-style.md).
-- When the user explicitly asks to upload, push, or save the finished article to a WeChat Official Account draft box, read [references/wechat-publishing.md](references/wechat-publishing.md) and then hand off to the separately installed `$baoyu-post-to-wechat` skill.
+- When the user explicitly asks to upload, push, or save the finished article to a WeChat Official Account draft box, read [references/wechat-publishing.md](references/wechat-publishing.md) and then hand off to the separately installed `$baoyu-post-to-wechat` skill from the controlled fork recorded in [integrations/baoyu-post-to-wechat.lock](integrations/baoyu-post-to-wechat.lock).
 - When the article needs diagrams, figures, a cover, or a separate visual plan, read [references/visual-design.md](references/visual-design.md).
 - For a general engineering article, adapt [templates/technical-blog.md](templates/technical-blog.md); for a design decision or architecture article, adapt [templates/design-doc.md](templates/design-doc.md). Never force unused sections into an article.
 - Read [examples/demo-before-after.md](examples/demo-before-after.md) only when an end-to-end calibration example would help.
@@ -48,6 +48,7 @@ Keep editing and external publication as separate operations.
 
 - Complete the requested editorial mode and final review before any publishing handoff.
 - Invoke `$baoyu-post-to-wechat` only when the user explicitly requests a remote WeChat action such as uploading the article or saving it to the Official Account draft box.
+- Invoke the locally installed publisher snapshot. Never fetch, install, or upgrade publisher code during a publishing request.
 - Pass the final Markdown file to the publishing skill. Do not pre-convert it to HTML; that skill owns WeChat rendering, image upload, metadata validation, account selection, and draft creation.
 - Treat draft creation as an external write. Never infer permission to mass-send or otherwise publish the draft to subscribers.
 - If `$baoyu-post-to-wechat` is unavailable or its account prerequisites are incomplete, preserve the local article and report the missing prerequisite instead of emulating publication.

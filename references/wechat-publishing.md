@@ -7,10 +7,18 @@ Use this integration only when the user explicitly asks to upload an article or 
 | Component | Responsibility |
 |---|---|
 | `article-editor` | Edit, verify, and produce the final Markdown article and optional visual plan |
-| `baoyu-post-to-wechat` | Render WeChat-compatible content, upload images, validate metadata, select an account and method, and create the remote draft |
+| `baoyu-post-to-wechat` from `MisterRaindrop/baoyu-skills` | Render WeChat-compatible content, upload images, validate metadata, select an account and method, and create the remote draft |
 | Author or account operator | Review the remote draft and decide whether to send it to subscribers |
 
 Do not copy publisher credentials into this skill or reimplement the publisher's scripts here. Follow the installed publisher skill as the source of truth for its current API, browser, configuration, and troubleshooting procedures.
+
+## Controlled dependency
+
+- Install the publisher only from the `article-editor` branch of `MisterRaindrop/baoyu-skills`.
+- Treat `main` in that fork as the upstream mirror and `article-editor` as the reviewed integration branch.
+- Use the exact commit recorded in `integrations/baoyu-post-to-wechat.lock` for reproducible installation.
+- Never update from `JimLiu/baoyu-skills` or a floating branch as part of a live publishing request.
+- If the installed publisher is missing or older than the recorded snapshot, stop before the external write and report the dependency mismatch.
 
 ## Handoff checklist
 
